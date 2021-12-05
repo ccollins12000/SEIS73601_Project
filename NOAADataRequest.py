@@ -34,6 +34,9 @@ class NOAADataRequest:
         self._CURRENT_PAGE = None
         self._PAGES = None
         self._RESULTS = []
+    
+    def set_api(self,end_point):
+        self._url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/{end_point}/".format(end_point=end_point)
         
     def parse_response(self, request_data):
         """Parase the metadata and results from a station data request. Updates the page attributes of the DataRequest object.
@@ -64,7 +67,7 @@ class NOAADataRequest:
         #parse results, appends the reuslt list to the objects existing result list.
         self._RESULTS.extend(request_data.get('results', []))
 
-    def request_result_page(self, start_date, end_date, page=None, data_set_id=None, location_id=None, station_id=None):
+    def request_result_page(self, start_date, end_date, page=None, data_set_id=None, location_id=None, station_id=None, location_category_id=None, data_category_id=None):
         """Get a page of data from the NOAA api
 
         args:
@@ -99,6 +102,12 @@ class NOAADataRequest:
             
         if station_id:
             parameters.update({'stationid':station_id})
+            
+        if location_category_id:
+            parameters.update({'locationcategoryid':location_category_id})
+
+        if data_category_id:
+            parameters.update({'datacategoryid':data_category_id})
         
         #make request
         response = requests.get(url=self._url, headers=headers, params=parameters)
