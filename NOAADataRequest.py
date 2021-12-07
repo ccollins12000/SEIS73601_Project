@@ -57,7 +57,6 @@ class NOAADataRequest:
         # parse metadata
         
         metadata = request_data.get('metadata', {}).get('resultset', {})
-        print(metadata)
         self._RECORD_COUNT = metadata.get('count', 0)
         self._RECORDS_PER_PAGE = metadata.get('limit', 0)
         self._CURRENT_PAGE = metadata.get('offset', 0)
@@ -135,20 +134,78 @@ class NOAADataRequest:
         else:
             return {"status": response.status_code}
 
-        
 
+def get_station_summary(api_key, sation_id, start_year, end_year):
+    """Get all the daily summaries for a station between two years
+
+        args:
+            api_key (str): Your NOAA api key. You can request a key here: https://www.ncdc.noaa.gov/cdo-web/token
+            station_id (str): The id of the NOAA station. Example GHCND:USC00210075. Stations can be searched for at https://www.ncdc.noaa.gov/data-access/land-based-station-data/find-station
+            start_year (int): The year to start at
+            end_year (int): The last year to retrieve
+
+        returns:
+            A pandas dataframe with all the data
+            """
+    NOAA = NOAADataRequest(api_key)
+    NOAA.set_api('data')
+    
+    for year in range(start_year, end_year+1):
+        print(year, " : ", end_year)
+        
+        #start at page 1
+        current_page = 1
+        pages = 1
+        while current_page <= pages:
+            NOAA.request_result_page(
+                    data_type_id = ['TMIN', 'TMAX', 'TAVG'],
+                    start_date= str(year) + '-01-01', 
+                    end_date= str(year) + '-12-31',
+                    station_id = sation_id,
+                    data_set_id='GHCND',
+                    page=current_page
+                    )
+            current_page = NOAA._CURRENT_PAGE + 1
+            pages = NOAA._PAGES
+            if current_page is None or pages is None:
+                break
+            time.sleep(.1)
+            
+    return pd.DataFrame(NOAA._RESULTS)
+
+
+                       
 if __name__ == "__main__":
     token = input('Enter your NOAA token: ')
     NOAA = NOAADataRequest(token)
-    NOAA.set_api('stations')
-    NOAA.request_result_page(location_id='FIPS:27', data_set_id='GHCND', start_date='2020-12-31', end_date='2020-12-31')
-    pd.DataFrame(NOAA._RESULTS).to_csv('test_locations.csv')
+    
+    #get data types
+    #NOAA = NOAADataRequest(token)
+    #NOAA.set_api('datatypes')
+    #NOAA.request_result_page(start_date='2020-01-01', end_date='2020-01-31')
+    
+    #get data categories
+    #NOAA = NOAADataRequest(token)
+    #NOAA.set_api('datacategories')
+    #NOAA.request_result_page(start_date='2020-01-01', end_date='2020-01-31')
+    
+    #Get US state summaries
+    #NOAA = NOAADataRequest(token)
+    #NOAA.set_api('locations')
+    #NOAA.request_result_page(location_category_id='ST', data_category_id='GHCND')
+    
+    #Get stations in state
+    #NOAA = NOAADataRequest(token)
+    #NOAA.set_api('stations')
+    #NOAA.request_result_page(location_id='FIPS:27', data_set_id='GHCND', start_date='2020-12-31', end_date='2020-12-31')
+        
+    #get station info
+    #NOAA = NOAADataRequest(token)
+    #NOAA.set_api('stations')
+    #NOAA.request_result_page(default='WBAN:94948')
     
     
-
-
-
-
+    get_station_summary(token, 'GHCND:USW00014922', 2020, 2021).to_csv('test.csv')
 
 
 
