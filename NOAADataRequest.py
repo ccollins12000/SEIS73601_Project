@@ -36,7 +36,7 @@ class NOAADataRequest:
         self._RESULTS = []
     
     def set_api(self,end_point):
-        self._url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/{end_point}/".format(end_point=end_point)
+        self._url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/{end_point}".format(end_point=end_point)
         
     def parse_response(self, request_data):
         """Parase the metadata and results from a station data request. Updates the page attributes of the DataRequest object.
@@ -55,7 +55,9 @@ class NOAADataRequest:
             request_data (obj): A parsed json response
         """
         # parse metadata
-        metadata = request_data.get('metadata', {})
+        
+        metadata = request_data.get('metadata', {}).get('resultset', {})
+        print(metadata)
         self._RECORD_COUNT = metadata.get('count', 0)
         self._RECORDS_PER_PAGE = metadata.get('limit', 0)
         self._CURRENT_PAGE = metadata.get('offset', 0)
@@ -67,7 +69,7 @@ class NOAADataRequest:
         #parse results, appends the reuslt list to the objects existing result list.
         self._RESULTS.extend(request_data.get('results', []))
 
-    def request_result_page(self, start_date, end_date, page=None, data_set_id=None, location_id=None, station_id=None, location_category_id=None, data_category_id=None):
+    def request_result_page(self, default=None, start_date=None, end_date=None, page=None, data_set_id=None, data_type_id = None, location_id=None, station_id=None, location_category_id=None, data_category_id=None):
         """Get a page of data from the NOAA api
 
         args:
@@ -84,13 +86,25 @@ class NOAADataRequest:
         
         #setup parameters for request
         parameters = {
-            'includemetadata':'true',
+            #'includemetadata':'true',
             'units': 'standard',
-            'limit': 1000,  # maximum is 1000 https://www.ncdc.noaa.gov/cdo-web/webservices/v2#data,
-            'startdate': start_date,
-            'enddate': end_date
+            'limit': 1000  # maximum is 1000 https://www.ncdc.noaa.gov/cdo-web/webservices/v2#data,
         }
         
+        url = self._url
+        
+        if default:
+            url += default
+            
+        if data_type_id:
+            parameters.update({'datatypeid': data_type_id})
+            
+        if start_date:
+            parameters.update({'startdate':start_date})
+            
+        if end_date:
+            parameters.update({'enddate':end_date})
+            
         if data_set_id:
             parameters.update({'datasetid':data_set_id})
             
@@ -110,10 +124,13 @@ class NOAADataRequest:
             parameters.update({'datacategoryid':data_category_id})
         
         #make request
-        response = requests.get(url=self._url, headers=headers, params=parameters)
+        response = requests.get(url=url, headers=headers, params=parameters)
         
         if response.status_code == 200:
-            self.parse_response(json.loads(response.text))
+            data = json.loads(response.text)
+            self.parse_response(data)
+            if default:
+                return data
             return {"status": response.status_code}
         else:
             return {"status": response.status_code}
@@ -123,14 +140,14 @@ class NOAADataRequest:
 if __name__ == "__main__":
     token = input('Enter your NOAA token: ')
     NOAA = NOAADataRequest(token)
-    NOAA.request_result_page(
-        start_date='2020-01-01', 
-        end_date='2020-01-31',
-        location_id = 'FIPS:02',
-        data_set_id='GHCND'
-        )
-    df = pd.DataFrame(NOAA._RESULTS)
-    df.to_csv('test.csv')
+    NOAA.set_api('stations')
+    NOAA.request_result_page(location_id='FIPS:27', data_set_id='GHCND', start_date='2020-12-31', end_date='2020-12-31')
+    pd.DataFrame(NOAA._RESULTS).to_csv('test_locations.csv')
+    
+    
+
+
+
 
 
 
