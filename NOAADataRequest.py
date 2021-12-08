@@ -135,7 +135,7 @@ class NOAADataRequest:
             return {"status": response.status_code}
 
 
-def get_station_summary(api_key, sation_id, start_year, end_year):
+def get_station_summary(api_key, sation_id, start_date, end_date, delta):
     """Get all the daily summaries for a station between two years
 
         args:
@@ -150,39 +150,78 @@ def get_station_summary(api_key, sation_id, start_year, end_year):
     NOAA = NOAADataRequest(api_key)
     NOAA.set_api('data')
     
-    for year in range(start_year, end_year+1):
-        print(year, " : ", end_year)
-        
+    while start_date <= end_date:
+        print(start_date, " : ", end_date)
         #start at page 1
-        current_page = 1
+        current_page = 0
         pages = 1
         while current_page <= pages:
+            current_page += 1
             NOAA.request_result_page(
-                    data_type_id = ['TMIN', 'TMAX', 'TAVG'],
-                    start_date= str(year) + '-01-01', 
-                    end_date= str(year) + '-12-31',
+                    #data_type_id = ['TMIN', 'TMAX', 'TAVG', 'PRCP', 'SNOW'],
+                    start_date= str(start_date), 
+                    end_date= str(start_date),
                     station_id = sation_id,
                     data_set_id='GHCND',
                     page=current_page
                     )
-            current_page = NOAA._CURRENT_PAGE + 1
+            current_page = NOAA._CURRENT_PAGE
             pages = NOAA._PAGES
             if current_page is None or pages is None:
                 break
-            time.sleep(.1)
-            
+            time.sleep(.2)
+        
+        start_date += delta
+        
     return pd.DataFrame(NOAA._RESULTS)
 
 
                        
 if __name__ == "__main__":
+    import datetime
+    import os
+    
     token = input('Enter your NOAA token: ')
     NOAA = NOAADataRequest(token)
     
+    
+    station_list = pd.read_csv('stations.csv')
+
+    
+
+    for station_index, station_row in station_list.iterrows():
+        
+        station = station_row['Close_Station']
+        
+        print(station_index, " : ", station )
+        
+        
+        station = 'GHCND:USC00218450'
+        
+        station_file_path = station.replace(":", "_") +".csv"
+        
+        
+        
+        
+        if station_file_path in os.listdir():
+            continue
+    
+        start_date = datetime.date(2021, 10, 1)
+        end_date = datetime.date(2021, 10, 1)
+        delta = datetime.timedelta(days=1)
+        get_station_summary(token, station, start_date, end_date, delta).to_csv(station_file_path)
+        
+        #break
+        
+
+    
     #get data types
-    #NOAA = NOAADataRequest(token)
-    #NOAA.set_api('datatypes')
-    #NOAA.request_result_page(start_date='2020-01-01', end_date='2020-01-31')
+    NOAA = NOAADataRequest(token)
+    NOAA.set_api('datatypes')
+    NOAA.request_result_page(start_date='2020-01-01', end_date='2020-01-31', data_set_id='GHCND')
+    pd.DataFrame(NOAA._RESULTS).to_csv('data_types.csv')
+
+    #10,000
     
     #get data categories
     #NOAA = NOAADataRequest(token)
@@ -204,8 +243,7 @@ if __name__ == "__main__":
     #NOAA.set_api('stations')
     #NOAA.request_result_page(default='WBAN:94948')
     
-    
-    get_station_summary(token, 'GHCND:USW00014922', 2020, 2021).to_csv('test.csv')
+
 
 
 
