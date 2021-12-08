@@ -1,0 +1,68 @@
+,mindate,maxdate,name,datacoverage,id
+0,1982-01-01,2021-12-04,Average wind speed,1.0,AWND
+1,1832-05-11,2021-12-05,Number of days included in the multiday precipitation total (MDPR),1.0,DAPR
+2,1877-01-02,2021-02-19,Number of days included in the multiday snow fall total (MDSF) ,1.0,DASF
+3,1863-05-04,2021-12-02,Number of days included in the multiday minimum temperature (MDTN),1.0,DATN
+4,1863-05-04,2021-12-01,Number of days included in the multiday maximum temperature (MDTX),1.0,DATX
+5,1832-05-11,2021-12-01,Number of days with non-zero precipitation included in multiday precipitation total (MDPR),1.0,DWPR
+6,1893-01-09,2021-10-31,Evaporation of water from evaporation pan,1.0,EVAP
+7,1832-05-11,2021-12-05,"Multiday precipitation total (use with DAPR and DWPR, if available)",1.0,MDPR
+8,1859-12-29,2021-02-19,Multiday snowfall total ,1.0,MDSF
+9,1863-05-04,2021-12-02,Multiday minimum temperature (use with DATN),1.0,MDTN
+10,1863-05-04,2021-12-01,Multiday maximum temperature (use with DATX),1.0,MDTX
+11,1950-11-28,2021-10-31,Daily minimum temperature of water in an evaporation pan,1.0,MNPN
+12,1921-12-09,2021-10-31,Daily maximum temperature of water in an evaporation pan,1.0,MXPN
+13,1948-01-01,2021-12-03,Peak gust time,1.0,PGTM
+14,1781-01-01,2021-12-05,Precipitation,1.0,PRCP
+15,1965-01-01,2021-09-30,Daily percent of possible sunshine for the period,1.0,PSUN
+16,1982-01-01,2021-10-31,Minimum soil temperature with bare ground cover at 5 cm depth,1.0,SN31
+17,1982-01-01,2021-10-31,Minimum soil temperature with bare ground cover at 10 cm depth,1.0,SN32
+18,1982-01-01,2021-10-31,Minimum soil temperature with bare ground cover at 20 cm depth,1.0,SN33
+19,2005-01-01,2021-10-31,Minimum soil temperature with bare ground cover at 100 cm depth,1.0,SN35
+20,2006-03-01,2021-10-31,Minimum soil temperature with bare ground cover at 150 cm depth,1.0,SN36
+21,1982-01-01,2021-10-31,Minimum soil temperature with sod cover at 5 cm depth,1.0,SN51
+22,1982-01-01,2021-10-31,Minimum soil temperature with sod cover at 10 cm depth,1.0,SN52
+23,1982-01-01,2021-10-31,Minimum soil temperature with sod cover at 20 cm depth,1.0,SN53
+24,2002-03-01,2021-10-31,Minimum soil temperature with sod cover at 100 cm depth,1.0,SN55
+25,2012-09-27,2021-10-31,Minimum soil temperature with sod cover at 150 cm depth,1.0,SN56
+26,1840-05-01,2021-12-05,Snowfall,1.0,SNOW
+27,1857-01-18,2021-12-05,Snow depth,1.0,SNWD
+28,1982-01-01,2021-10-31,Maximum soil temperature with bare ground cover at 5 cm depth,1.0,SX31
+29,1982-01-01,2021-10-31,Maximum soil temperature with bare ground cover at 10 cm depth,1.0,SX32
+30,1982-01-01,2021-10-31,Maximum soil temperature with bare ground cover at 20 cm depth,1.0,SX33
+31,2005-01-01,2021-10-31,Maximum soil temperature with bare ground cover at 100 cm depth,0.9837,SX35
+32,2011-01-01,2021-10-31,Maximum soil temperature with bare ground cover at 150 cm depth,1.0,SX36
+33,1982-01-01,2021-10-31,Maximum soil temperature with sod cover at 5 cm depth,1.0,SX51
+34,1982-01-01,2021-10-31,Maximum soil temperature with sod cover at 10 cm depth,1.0,SX52
+35,1982-01-01,2021-10-31,Maximum soil temperature with sod cover at 20 cm depth,1.0,SX53
+36,2002-03-01,2021-10-31,Maximum soil temperature with sod cover at 100 cm depth,1.0,SX55
+37,2012-09-27,2021-10-31,Maximum soil temperature with sod cover at 150 cm depth,1.0,SX56
+38,1874-10-13,2021-12-04,Average Temperature.,1.0,TAVG
+39,1926-03-17,2021-10-31,Thickness of ice on water,1.0,THIC
+40,1763-01-01,2021-12-05,Maximum temperature,1.0,TMAX
+41,1763-01-01,2021-12-05,Minimum temperature,1.0,TMIN
+42,1876-11-27,2021-12-05,Temperature at the time of observation,1.0,TOBS
+43,1965-01-01,2021-10-30,Total sunshine for the period,1.0,TSUN
+44,1993-06-01,2021-12-03,Direction of fastest 2-minute wind,1.0,WDF2
+45,1993-06-01,2021-12-03,Direction of fastest 5-second wind,1.0,WDF5
+46,1948-01-01,2021-12-04,Direction of peak wind gust,1.0,WDFG
+47,1859-10-01,2021-10-31,Total wind movement,1.0,WDMV
+48,1952-07-01,2021-12-05,Water equivalent of snow on the ground,1.0,WESD
+49,1998-06-01,2021-12-05,Water equivalent of snowfall,1.0,WESF
+50,1993-06-01,2021-12-03,Fastest 2-minute wind speed,1.0,WSF2
+51,1993-06-01,2021-12-03,Fastest 5-second wind speed,1.0,WSF5
+52,1948-01-01,2021-12-04,Peak gust wind speed,1.0,WSFG
+53,1965-01-01,2021-12-04,Highest instantaneous wind speed,1.0,WSFI
+54,1851-05-19,2021-12-03,"Fog, ice fog, or freezing fog (may include heavy fog)",1.0,WT01
+55,1900-12-23,2021-12-03,Heavy fog or heaving freezing fog (not always distinguished from fog),1.0,WT02
+56,1851-04-02,2021-12-02,Thunder,1.0,WT03
+57,1852-02-20,2021-12-02,"Ice pellets, sleet, snow pellets, or small hail"" ",1.0,WT04
+58,1851-04-13,2021-12-03,Hail (may include small hail),1.0,WT05
+59,1890-03-28,2021-12-02,Glaze or rime ,1.0,WT06
+60,1891-12-21,2021-11-25,"Dust, volcanic ash, blowing dust, blowing sand, or blowing obstruction",1.0,WT07
+61,1851-04-11,2021-12-03,Smoke or haze ,1.0,WT08
+62,1852-02-12,2021-12-01,Blowing or drifting snow,1.0,WT09
+63,1886-03-20,2021-11-11,"Tornado, waterspout, or funnel cloud"" ",1.0,WT10
+64,1851-04-03,2021-10-31,High or damaging winds,1.0,WT11
+65,1982-01-18,2021-01-31,Freezing rain ,1.0,WT17
+66,1851-04-13,2021-03-16,"Snow, snow pellets, snow grains, or ice crystals",1.0,WT18
