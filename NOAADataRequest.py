@@ -69,20 +69,20 @@ class NOAADataRequest:
         #parse results, appends the reuslt list to the objects existing result list.
         self._RESULTS.extend(request_data.get('results', []))
 
-    def request_result_page(self, default=None, start_date=None, end_date=None, page=None, data_set_id=None, data_type_id = None, location_id=None, station_id=None, location_category_id=None, data_category_id=None):
+    def request_result_page(self, default=None, **kwargs):
         """Get a page of data from the NOAA api
 
         args:
             offset (int): Which page of data to retrieve
             default (str): If utilzing an API endpoint that return single records with an initial unnamed parameter. Such as a station details lookup
-            start_date (str): The start date in format yyyy-mm-dd
-            end_date (str): The end date in format yyyy-mm-dd
-            page (int): For requests that return results split across multiple pages, set the offse here
-            data_set_id (str): The data set to retrieve. This can be passed as a list. Example: ['TMIN', 'TMAX', 'TAVG']
-            data_type_id (str): Specify if there a specific data points that you want from a certain data set
-            location_id (str): The id of the location to retrieve data about. (You must past at least locationid or stationid)
-            station_id (str): The id of the station to retrieve data about. (You must past at least locationid or stationid)
-            data_category_id (str): Specify if there is a general data category that you are querying for
+            startdate (str): The start date in format yyyy-mm-dd
+            enddate (str): The end date in format yyyy-mm-dd
+            offset (int): For requests that return results split across multiple pages, set the offse here
+            datasetid (str): The data set to retrieve. This can be passed as a list. Example: ['TMIN', 'TMAX', 'TAVG']
+            datatypeid (str): Specify if there a specific data points that you want from a certain data set
+            locationid (str): The id of the location to retrieve data about. (You must past at least locationid or stationid)
+            stationid (str): The id of the station to retrieve data about. (You must past at least locationid or stationid)
+            datacategoryid (str): Specify if there is a general data category that you are querying for
             
             For more information about the specific parameters for each API endpoint go to: https://www.ncdc.noaa.gov/cdo-web/webservices/v2
             The api endpoint can be set with the set_api method
@@ -103,33 +103,9 @@ class NOAADataRequest:
         
         if default:
             url += default
-            
-        if data_type_id:
-            parameters.update({'datatypeid': data_type_id})
-            
-        if start_date:
-            parameters.update({'startdate':start_date})
-            
-        if end_date:
-            parameters.update({'enddate':end_date})
-            
-        if data_set_id:
-            parameters.update({'datasetid':data_set_id})
-            
-        if page:
-            parameters.update({'offset':page})
-            
-        if location_id:
-            parameters.update({'locationid':location_id})
-            
-        if station_id:
-            parameters.update({'stationid':station_id})
-            
-        if location_category_id:
-            parameters.update({'locationcategoryid':location_category_id})
-
-        if data_category_id:
-            parameters.update({'datacategoryid':data_category_id})
+              
+        for key, value in kwargs.items():
+            parameters.update({key: value})
         
         #make request
         response = requests.get(url=url, headers=headers, params=parameters)
@@ -165,14 +141,14 @@ def get_station_summary(api_key, sation_id, start_date, end_date, delta):
         while current_page < pages:
             current_page += 1
             NOAA.request_result_page(
-                    start_date= str(start_date), 
+                    startdate= str(start_date), 
                     
                     # add delta and substract 1 day so that date range goes from start date to one day before next
                     # iterations start date (day is most granular time value for GHCND data (daily summaries))
-                    end_date= str(start_date + delta - datetime.timedelta(days=1)),
-                    station_id = sation_id,
-                    data_set_id='GHCND',
-                    page=current_page
+                    enddate= str(start_date + delta - datetime.timedelta(days=1)),
+                    stationid = sation_id,
+                    datasetid='GHCND',
+                    offset=current_page
                     )
             
             current_page = NOAA._CURRENT_PAGE
@@ -222,8 +198,7 @@ if __name__ == "__main__":
         end_date = datetime.date(2021, 12, 1)
         delta = relativedelta(months=1)
         get_station_summary(token, station, start_date, end_date, delta).to_csv(station_file_path)
-        
-        #.to_csv(station_file_path)
+    
         
         
 
@@ -231,33 +206,30 @@ if __name__ == "__main__":
     #get data types
     #NOAA = NOAADataRequest(token)
     #NOAA.set_api('datatypes')
-    #NOAA.request_result_page(start_date='2020-01-01', end_date='2020-01-31', data_set_id='GHCND')
-    #pd.DataFrame(NOAA._RESULTS).to_csv('data_types.csv')
+    #NOAA.request_result_page(startdate='2020-01-01', enddate='2020-01-31', datasetid='GHCND')
+    #pd.DataFrame(NOAA._RESULTS)#.to_csv('data_types.csv')
 
     #10,000
     
     #get data categories
     #NOAA = NOAADataRequest(token)
     #NOAA.set_api('datacategories')
-    #NOAA.request_result_page(start_date='2020-01-01', end_date='2020-01-31')
+    #NOAA.request_result_page(startdate='2020-01-01', enddate='2020-01-31')
     
     #Get US state summaries
     #NOAA = NOAADataRequest(token)
     #NOAA.set_api('locations')
-    #NOAA.request_result_page(location_category_id='ST', data_category_id='GHCND')
+    #NOAA.request_result_page(locationcategoryid='ST', datacategoryid='GHCND')
     
     #Get stations in state
     #NOAA = NOAADataRequest(token)
     #NOAA.set_api('stations')
-    #NOAA.request_result_page(location_id='FIPS:27', data_set_id='GHCND', start_date='2020-12-31', end_date='2020-12-31')
+    #NOAA.request_result_page(locationid='FIPS:27', datasetid='GHCND', startdate='2020-12-31', enddate='2020-12-31')
         
     #get station info
     #NOAA = NOAADataRequest(token)
     #NOAA.set_api('stations')
     #NOAA.request_result_page(default='WBAN:94948')
-    
-
-
 
 
 
