@@ -12,6 +12,7 @@ import math
 import time
 import pandas as pd
 from dateutil import parser
+from dateutil.relativedelta import relativedelta
 
 class NOAADataRequest:
     """An object for request data from an NOAA station
@@ -23,7 +24,7 @@ class NOAADataRequest:
         """The constructor for a data request for a NOAA station
 
         args:
-            station_id (str): The id of the NOAA station. Example GHCND:USC00210075. Stations can be searched for at https://www.ncdc.noaa.gov/data-access/land-based-station-data/find-station
+            DEPRECIATED station_id (str): The id of the NOAA station. Example GHCND:USC00210075. Stations can be searched for at https://www.ncdc.noaa.gov/data-access/land-based-station-data/find-station
             api_key (str): Your NOAA api key. You can request a key here: https://www.ncdc.noaa.gov/cdo-web/token
         """
         self._url = 'https://www.ncdc.noaa.gov/cdo-web/api/v2/data/'
@@ -73,14 +74,22 @@ class NOAADataRequest:
 
         args:
             offset (int): Which page of data to retrieve
+            default (str): If utilzing an API endpoint that return single records with an initial unnamed parameter. Such as a station details lookup
             start_date (str): The start date in format yyyy-mm-dd
             end_date (str): The end date in format yyyy-mm-dd
-            datasetid (str): The data set to retrieve. This can be passed as a list. Example: ['TMIN', 'TMAX', 'TAVG']
-            locationid (str): The id of the location to retrieve data about. (You must past at least locationid or stationid)
-            stationid (str): The id of the station to retrieve data about. (You must past at least locationid or stationid)
+            page (int): For requests that return results split across multiple pages, set the offse here
+            data_set_id (str): The data set to retrieve. This can be passed as a list. Example: ['TMIN', 'TMAX', 'TAVG']
+            data_type_id (str): Specify if there a specific data points that you want from a certain data set
+            location_id (str): The id of the location to retrieve data about. (You must past at least locationid or stationid)
+            station_id (str): The id of the station to retrieve data about. (You must past at least locationid or stationid)
+            data_category_id (str): Specify if there is a general data category that you are querying for
+            
+            For more information about the specific parameters for each API endpoint go to: https://www.ncdc.noaa.gov/cdo-web/webservices/v2
+            The api endpoint can be set with the set_api method
         returns:
             The reponse text as parsed json
         """
+        #set the api key
         headers = {'token': self._API_KEY}
         
         #setup parameters for request
@@ -143,7 +152,7 @@ def get_station_summary(api_key, sation_id, start_date, end_date, delta):
             station_id (str): The id of the NOAA station. Example GHCND:USC00210075. Stations can be searched for at https://www.ncdc.noaa.gov/data-access/land-based-station-data/find-station
             start_year (int): The year to start at
             end_year (int): The last year to retrieve
-
+            delta (obj): A timedelta or relativedelta that specifies how much time to pull on each iteration. Most granular timeframe is a timedelta with days = 1
         returns:
             A pandas dataframe with all the data
             """
@@ -151,28 +160,34 @@ def get_station_summary(api_key, sation_id, start_date, end_date, delta):
     NOAA.set_api('data')
     
     while start_date <= end_date:
-        print(start_date, " : ", end_date)
-        #start at page 1
         current_page = 0
         pages = 1
-        while current_page <= pages:
+        while current_page < pages:
             current_page += 1
             NOAA.request_result_page(
-                    #data_type_id = ['TMIN', 'TMAX', 'TAVG', 'PRCP', 'SNOW'],
                     start_date= str(start_date), 
-                    end_date= str(start_date),
+                    
+                    # add delta and substract 1 day so that date range goes from start date to one day before next
+                    # iterations start date (day is most granular time value for GHCND data (daily summaries))
+                    end_date= str(start_date + delta - datetime.timedelta(days=1)),
                     station_id = sation_id,
                     data_set_id='GHCND',
                     page=current_page
                     )
+            
             current_page = NOAA._CURRENT_PAGE
             pages = NOAA._PAGES
+            
+            #if no data exists to page through then break from loop
             if current_page is None or pages is None:
                 break
+            
+            #API limits to 5 requests per second
             time.sleep(.2)
         
         start_date += delta
-        
+    
+    #results from each page are appended to list in _RESULTS property
     return pd.DataFrame(NOAA._RESULTS)
 
 
@@ -196,30 +211,28 @@ if __name__ == "__main__":
         print(station_index, " : ", station )
         
         
-        station = 'GHCND:USC00218450'
+        #station = 'GHCND:USW00023234'
         
         station_file_path = station.replace(":", "_") +".csv"
-        
-        
-        
-        
+    
         if station_file_path in os.listdir():
             continue
     
-        start_date = datetime.date(2021, 10, 1)
-        end_date = datetime.date(2021, 10, 1)
-        delta = datetime.timedelta(days=1)
+        start_date = datetime.date(2021, 1, 1)
+        end_date = datetime.date(2021, 12, 1)
+        delta = relativedelta(months=1)
         get_station_summary(token, station, start_date, end_date, delta).to_csv(station_file_path)
         
-        #break
+        #.to_csv(station_file_path)
+        
         
 
     
     #get data types
-    NOAA = NOAADataRequest(token)
-    NOAA.set_api('datatypes')
-    NOAA.request_result_page(start_date='2020-01-01', end_date='2020-01-31', data_set_id='GHCND')
-    pd.DataFrame(NOAA._RESULTS).to_csv('data_types.csv')
+    #NOAA = NOAADataRequest(token)
+    #NOAA.set_api('datatypes')
+    #NOAA.request_result_page(start_date='2020-01-01', end_date='2020-01-31', data_set_id='GHCND')
+    #pd.DataFrame(NOAA._RESULTS).to_csv('data_types.csv')
 
     #10,000
     

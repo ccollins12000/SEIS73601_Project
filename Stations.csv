@@ -1,2 +1,6 @@
 ﻿State,City,Close_Station,Alternative Name
 Minnesota,Saint Paul,GHCND:USC00218450,University of Minnesota
+,Boston,GHCND:US1MASF0001,
+,Charlotte ,GHCND:USW00013881,
+,San Fran,GHCND:US1CASF0017,
+,"SEATTLE TACOMA AIRPORT, WA US",GHCND:USW00024233,
